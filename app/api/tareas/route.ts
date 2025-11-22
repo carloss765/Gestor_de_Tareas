@@ -34,3 +34,43 @@ export async function POST(req: Request) {
     tareas.push(newTarea)
     return Response.json(newTarea)
 }
+export async function DELETE(req: Request) {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+        return Response.json({error: 'ID requerido'}, {status: 400})
+    }
+
+    const index = tareas.findIndex(t => t.id === parseInt(id))
+
+    if (index === -1) {
+        return Response.json({error: 'Tarea no encontrada'}, {status: 404})
+    }
+
+    const deletedTarea = tareas[index]
+    tareas.splice(index, 1)
+
+    return Response.json(deletedTarea)
+}
+
+export async function PATCH(req: Request) {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+    const body = await req.json()
+
+    if (!id) {
+        return Response.json({error: 'ID requerido'}, {status: 400})
+    }
+
+    const tarea = tareas.find(t => t.id === parseInt(id))
+
+    if (!tarea) {
+        return Response.json({error: 'Tarea no encontrada'}, {status: 404})
+    }
+
+    tarea.titulo = body.titulo || tarea.titulo
+    tarea.descripcion = body.descripcion || tarea.descripcion
+
+    return Response.json(tarea)
+}

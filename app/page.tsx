@@ -14,12 +14,13 @@ export default function Home() {
 
   const [tareas, setTareas] = useState<Tarea[]>([])
   const [focusTarea, setFocusTarea] = useState<Tarea | null>(null)
+  const fetchTareas = () => {
+    fetch("http://localhost:3000/api/tareas")
+      .then(res => res.json())
+      .then(data => setTareas(data))
+  }
+
   useEffect(() => {
-    const fetchTareas = () => {
-      fetch("http://localhost:3000/api/tareas")
-        .then(res => res.json())
-        .then(data => setTareas(data))
-    }
     fetchTareas()
   }, [])
 
@@ -45,7 +46,13 @@ export default function Home() {
         </ul>
       </div>
       <div className="h-full w-full">
-        <TaskPreview tarea={focusTarea} />
+        <TaskPreview
+            tarea={focusTarea}
+            onDelete={() => {
+                fetchTareas()
+                setFocusTarea(null)
+            }}
+        />
       </div>
     </div>
   )

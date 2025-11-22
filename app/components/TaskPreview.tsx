@@ -10,7 +10,27 @@ interface TaskPreviewProps {
   tarea: Tarea | null;
 }
 
-export default function TaskPreview({ tarea }: TaskPreviewProps) {
+export default function TaskPreview({ tarea, onDelete }: TaskPreviewProps & { onDelete?: () => void }) {
+  const handleDelete = async () => {
+    if (!tarea) return;
+
+    if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
+      try {
+        const res = await fetch(`/api/tareas?id=${tarea.id}`, {
+          method: 'DELETE',
+        });
+
+        if (res.ok) {
+          if (onDelete) onDelete();
+        } else {
+          console.error('Error al eliminar la tarea');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  };
+
   if (!tarea) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-[var(--background-secondary)] rounded-3xl border border-white/5 shadow-inner p-6">
@@ -54,7 +74,10 @@ export default function TaskPreview({ tarea }: TaskPreviewProps) {
                 <IconEdit className="w-4 h-4" />
                 Editar
             </button>
-            <button className="px-5 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all duration-200 text-sm font-medium border border-red-500/10 hover:border-red-500/20 flex items-center gap-2">
+            <button
+                onClick={handleDelete}
+                className="px-5 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all duration-200 text-sm font-medium border border-red-500/10 hover:border-red-500/20 flex items-center gap-2"
+            >
                 <IconDelete className="w-4 h-4" />
                 Eliminar
             </button>
