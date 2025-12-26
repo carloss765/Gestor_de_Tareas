@@ -2,7 +2,11 @@ import { FilePlusCorner } from 'lucide-react';
 import { useState } from "react";
 import CrearTarea from "./CrearTarea";
 
-export default function Header() {
+interface HeaderProps {
+    onTareaCreated?: () => void
+}
+
+export default function Header({ onTareaCreated }: HeaderProps) {
     const [showCrearTarea, setShowCrearTarea] = useState(false)
 
     return (
@@ -15,7 +19,12 @@ export default function Header() {
                 <FilePlusCorner />
             </button>
 
-            {showCrearTarea && <CrearTarea setShowCrearTarea={setShowCrearTarea} />}
+            {showCrearTarea && (
+                <CrearTarea
+                    setShowCrearTarea={setShowCrearTarea}
+                    onTareaCreated={onTareaCreated}
+                />
+            )}
 
         </div>
     )

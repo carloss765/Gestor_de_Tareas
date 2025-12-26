@@ -16,9 +16,10 @@ export default function Home() {
   const [tareas, setTareas] = useState<Tarea[]>([])
   const [focusTarea, setFocusTarea] = useState<Tarea | null>(null)
   const fetchTareas = () => {
-    fetch("http://localhost:3000/api/tareas")
+    fetch("/api/tareas")
       .then(res => res.json())
       .then(data => setTareas(data))
+      .catch(error => console.error('Error fetching tareas:', error))
   }
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function Home() {
   return (
     <div className="flex items-stretch justify-center gap-2 h-screen w-screen p-4 bg-[var(--background)] overflow-hidden">
       <div className="flex-1 flex flex-col gap-2 h-full min-w-[300px] overflow-hidden rounded-3xl bg-[var(--background-secondary)] p-4 shadow-xl border border-white/5">
-        <Header />
+        <Header onTareaCreated={fetchTareas} />
         <ul className="flex items-center flex-col overflow-y-auto custom-scrollbar px-2 gap-2 w-full">
           {tareas.map((t: Tarea, index: number) => (
             <div
@@ -55,28 +56,28 @@ export default function Home() {
         minWidth="30%"
         maxWidth="70%"
         enable={{
-            top:false,
-            right:false,
-            bottom:false,
-            left:true,
-            topRight:false,
-            bottomRight:false,
-            bottomLeft:false,
-            topLeft:false
+          top: false,
+          right: false,
+          bottom: false,
+          left: true,
+          topRight: false,
+          bottomRight: false,
+          bottomLeft: false,
+          topLeft: false
         }}
         className="flex"
       >
         <div className="h-full w-full pl-2">
-            <TaskPreview
-                tarea={focusTarea}
-                onDelete={() => {
-                    fetchTareas()
-                    setFocusTarea(null)
-                }}
-                onUpdate={() => {
-                    fetchTareas()
-                }}
-            />
+          <TaskPreview
+            tarea={focusTarea}
+            onDelete={() => {
+              fetchTareas()
+              setFocusTarea(null)
+            }}
+            onUpdate={() => {
+              fetchTareas()
+            }}
+          />
         </div>
       </Resizable>
     </div>

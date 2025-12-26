@@ -1,19 +1,38 @@
 import { useState } from "react"
 
-export default function CrearTarea({ setShowCrearTarea }: { setShowCrearTarea: (show: boolean) => void }) {
+interface CrearTareaProps {
+    setShowCrearTarea: (show: boolean) => void
+    onTareaCreated?: () => void
+}
+
+export default function CrearTarea({ setShowCrearTarea, onTareaCreated }: CrearTareaProps) {
     const [titulo, setTitulo] = useState('')
     const [descripcion, setDescripcion] = useState('')
 
-    const submitTarea = async () => {
-        const response = await fetch('http://localhost:3000/api/tareas', {
+    const submitTarea = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        const response = await fetch('/api/tareas', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ titulo, descripcion }),
         })
-        const data = await response.json()
-        console.log(data)
-        setShowCrearTarea(false)
-        setTitulo('')
-        setDescripcion('')
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            setShowCrearTarea(false)
+            setTitulo('')
+            setDescripcion('')
+            // Notificar al padre que se creó una tarea
+            if (onTareaCreated) {
+                onTareaCreated()
+            }
+        } else {
+            console.error('Error al crear la tarea')
+        }
     }
 
     const handleClose = () => {
@@ -30,7 +49,7 @@ export default function CrearTarea({ setShowCrearTarea }: { setShowCrearTarea: (
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-2xl font-bold mb-2">Crear Tarea</h2>
-                <form onSubmit={submitTarea} className="grid grid-cols items-center justify-center gap-5 w-full">
+                <form onSubmit={(e) => submitTarea(e)} className="grid grid-cols items-center justify-center gap-5 w-full">
                     <input
                         type="text"
                         placeholder="Título"
